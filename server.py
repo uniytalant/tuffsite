@@ -1,37 +1,41 @@
 from flask import Flask, request, jsonify
 from flask_cors import CORS
-import sqlite3
+from flask_sqlalchemy import SQLAlchemy
 import os
+from datetime import datetime
 
 app = Flask(__name__)
 CORS(app)
 
-def get_db():
-    conn = sqlite3.connect("DB_forum.db")
-    return conn
+# Подключаемся к PostgreSQL (база данных не пропадает при перезапуске)
+# Render сам подставит DATABASE_URL из переменных окружения
+database_url = os.environ.get('DATABASE_URL')
+if database_url and database_url.startswith('postgres://'):
+    database_url = database_url.replace('postgres://', 'postgresql://', 1)
 
-# Функция для создания таблиц (если их нет)
-def create_tables():
-    conn = get_db()
-    cur = conn.cursor()
-    
-    cur.execute("""CREATE TABLE IF NOT EXISTS User_and_password (
-        id INTEGER PRIMARY KEY AUTOINCREMENT,
-        user_name TEXT,
-        password TEXT
-    )""")
-    
-    cur.execute("""CREATE TABLE IF NOT EXISTS User_and_massage (
-        id INTEGER PRIMARY KEY AUTOINCREMENT,
-        user_name TEXT,
-        massage TEXT
-    )""")
-    
-    conn.commit()
-    conn.close()
-    print("Таблицы проверены/созданы")
+app.config['SQLALCHEMY_DATABASE_URI'] = database_url or 'sqlite:///DB_forum.db'
+app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
 
-create_tables()
+db = SQLAlchemy(app)
+
+# --- МОДЕЛИ БАЗЫ ДАННЫХ ---
+class User_and_password(db.Model):
+    __tablename__ = 'User_and_password'
+    id = db.Column(db.Integer, primary_key=True)
+    user_name = db.Column(db.String(100), nullable=False)
+    password = db.Column(db.String(100), nullable=False)
+
+class User_and_massage(db.Model):
+    __tablename__ = 'User_and_massage'
+    id = db.Column(db.Integer, primary_key=True)
+    user_name = db.Column(db.String(100), nullable=False)
+    massage = db.Column(db.Text, nullable=False)
+    created_at = db.Column(db.DateTime, default=datetime.utcnow)
+
+# Создаём таблицы при первом запуске
+with app.app_context():
+    db.create_all()
+    print("Таблицы проверены/созданы в PostgreSQL")
 
 # --- HTML СТРАНИЦЫ ---
 @app.route('/')
@@ -53,7 +57,6 @@ def register_page():
 def wall_page():
     with open('wall.html', 'r', encoding='utf-8') as f:
         return f.read()
-# --------------------
 
 # --- API МАРШРУТЫ ---
 @app.route('/api/register', methods=['POST'])
@@ -62,16 +65,16 @@ def register():
     username = data.get('username')
     password = data.get('password')
     
-    conn = get_db()
-    cur = conn.cursor()
-    cur.execute("SELECT * FROM User_and_password WHERE user_name = ?", (username,))
-    if cur.fetchone():
-        conn.close()
+    # Проверяем, не занят ли ник
+    existing_user = User_and_password.query.filter_by(user_name=username).first()
+    if existing_user:
         return jsonify({"error": "Имя уже занято"}), 400
     
-    cur.execute("INSERT INTO User_and_password(user_name, password) VALUES (?,?)", (username, password))
-    conn.commit()
-    conn.close()
+    # Добавляем пользователя
+    new_user = User_and_password(user_name=username, password=password)
+    db.session.add(new_user)
+    db.session.commit()
+    
     return jsonify({"message": "Регистрация успешна!"}), 201
 
 @app.route('/api/login', methods=['POST'])
@@ -80,28 +83,20 @@ def login():
     username = data.get('username')
     password = data.get('password')
     
-    conn = get_db()
-    cur = conn.cursor()
-    cur.execute("SELECT id FROM User_and_password WHERE user_name = ? AND password = ?", (username, password))
-    user = cur.fetchone()
-    conn.close()
+    user = User_and_password.query.filter_by(user_name=username, password=password).first()
     
     if user:
-        return jsonify({"user_id": user[0], "username": username})
+        return jsonify({"user_id": user.id, "username": username})
     else:
         return jsonify({"error": "Неверное имя или пароль"}), 401
 
 @app.route('/api/posts', methods=['GET'])
 def get_posts():
-    conn = get_db()
-    cur = conn.cursor()
-    cur.execute("SELECT id, user_name, massage FROM User_and_massage ORDER BY id DESC")
-    posts = cur.fetchall()
-    conn.close()
+    posts = User_and_massage.query.order_by(User_and_massage.id.desc()).all()
     
     result = []
     for p in posts:
-        result.append({"id": p[0], "username": p[1], "text": p[2]})
+        result.append({"id": p.id, "username": p.user_name, "text": p.massage})
     return jsonify(result)
 
 @app.route('/api/posts', methods=['POST'])
@@ -110,11 +105,10 @@ def add_post():
     username = data.get('username')
     text = data.get('text')
     
-    conn = get_db()
-    cur = conn.cursor()
-    cur.execute("INSERT INTO User_and_massage(user_name, massage) VALUES (?,?)", (username, text))
-    conn.commit()
-    conn.close()
+    new_post = User_and_massage(user_name=username, massage=text)
+    db.session.add(new_post)
+    db.session.commit()
+    
     return jsonify({"message": "Пост добавлен!"}), 201
 
 if __name__ == '__main__':
