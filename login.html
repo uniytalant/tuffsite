@@ -163,7 +163,7 @@
             <button type="submit" class="btn-submit">Войти</button>
         </form>
         
-        <a href="index.html" class="back-link">← Вернуться на главную</a>
+        <a href="/index" class="back-link">← Вернуться на главную</a>
     </div>
 <script>
     document.querySelector('form').addEventListener('submit', async (e) => {
@@ -184,7 +184,7 @@
             localStorage.setItem('username', data.username);
             localStorage.setItem('userId', data.user_id);
             alert('Вход выполнен!');
-            window.location.href = 'wall.html';
+            window.location.href = '/wall';
         } else {
             alert(data.error || 'Неверный логин или пароль');
         }
