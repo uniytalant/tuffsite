@@ -1,0 +1,340 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>TUFF - Стена</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            background-color: #000000;
+            color: #ffffff;
+            font-family: 'Arial', sans-serif;
+            min-height: 100vh;
+            position: relative;
+            overflow-x: hidden;
+        }
+
+        /* Изображение в левом нижнем углу */
+        .bottom-left-image {
+            position: fixed;
+            bottom: 20px;
+            left: 10px;
+            width: 300px;
+            height: auto;
+            opacity: 0.8;
+            z-index: 1;
+        }
+
+        /* Изображение в правом верхнем углу */
+        .top-right-image {
+            position: fixed;
+            top: 0px;
+            right: 10px;
+            width: 450px;
+            height: auto;
+            opacity: 0.8;
+            z-index: 1;
+        }
+
+        /* Верхняя часть с логотипом */
+        .header {
+            text-align: center;
+            padding: 30px 20px;
+            position: relative;
+            z-index: 2;
+        }
+
+        .logo {
+            font-family: 'Times New Roman', serif;
+            font-size: 6rem;
+            text-transform: uppercase;
+            letter-spacing: 10px;
+            text-shadow: 0 0 20px rgba(255, 255, 255, 0.2);
+        }
+
+        /* Белая разделительная линия */
+        .divider {
+            width: 100%;
+            height: 1px;
+            background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.8), transparent);
+            margin: 0;
+        }
+
+        /* Основная часть со стеной */
+        .main-content {
+            padding: 40px 20px;
+            max-width: 800px;
+            margin: 0 auto;
+            position: relative;
+            z-index: 2;
+            padding-bottom: 100px;
+        }
+
+        /* Форма для нового сообщения */
+        .post-form {
+            margin-bottom: 40px;
+        }
+
+        .post-form textarea {
+            width: 100%;
+            padding: 20px;
+            background-color: rgba(255, 255, 255, 0.05);
+            border: 1px solid rgba(255, 255, 255, 0.3);
+            color: #ffffff;
+            font-size: 1rem;
+            font-family: 'Arial', sans-serif;
+            resize: vertical;
+            min-height: 100px;
+            outline: none;
+            transition: all 0.3s ease;
+        }
+
+        .post-form textarea:focus {
+            border-color: #ffffff;
+            box-shadow: 0 0 10px rgba(255, 255, 255, 0.3);
+        }
+
+        .post-form textarea::placeholder {
+            color: rgba(255, 255, 255, 0.5);
+        }
+
+        .btn-post {
+            display: block;
+            width: 100%;
+            padding: 15px;
+            background-color: transparent;
+            border: 1px solid rgba(255, 255, 255, 0.3);
+            color: #ffffff;
+            font-size: 1.1rem;
+            text-transform: uppercase;
+            letter-spacing: 3px;
+            cursor: pointer;
+            transition: all 0.4s ease;
+            margin-top: 15px;
+        }
+
+        .btn-post:hover {
+            background-color: #ffffff;
+            color: #000000;
+            border-color: #ffffff;
+            box-shadow: 0 0 15px rgba(255, 255, 255, 0.5);
+        }
+
+        /* Стена с сообщениями */
+        .wall {
+            display: flex;
+            flex-direction: column;
+            gap: 20px;
+        }
+
+        .post {
+            background-color: rgba(255, 255, 255, 0.05);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            padding: 25px;
+            transition: all 0.3s ease;
+        }
+
+        .post:hover {
+            border-color: rgba(255, 255, 255, 0.5);
+            box-shadow: 0 0 20px rgba(255, 255, 255, 0.1);
+        }
+
+        .post-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 15px;
+            padding-bottom: 15px;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+        }
+
+        .post-author {
+            font-family: 'Times New Roman', serif;
+            font-size: 1.3rem;
+            letter-spacing: 2px;
+            text-transform: uppercase;
+        }
+
+        .post-date {
+            font-size: 0.8rem;
+            color: rgba(255, 255, 255, 0.5);
+            letter-spacing: 1px;
+        }
+
+        .post-content {
+            font-size: 1rem;
+            line-height: 1.6;
+            color: rgba(255, 255, 255, 0.9);
+        }
+
+        /* Кнопка выхода */
+        .logout-btn {
+            position: fixed;
+            top: 30px;
+            left: 30px;
+            color: rgba(255, 255, 255, 0.5);
+            text-decoration: none;
+            font-size: 0.9rem;
+            letter-spacing: 2px;
+            text-transform: uppercase;
+            transition: all 0.3s ease;
+            z-index: 10;
+        }
+
+        .logout-btn:hover {
+            color: #ffffff;
+        }
+
+        @media (max-width: 600px) {
+            .logo { font-size: 3.5rem; }
+            .bottom-left-image { width: 150px; }
+            .top-right-image { width: 200px; }
+            .post-author { font-size: 1.1rem; }
+        }
+    </style>
+</head>
+<body>
+    <!-- Кнопка выхода -->
+    <a href="index.html" class="logout-btn">← Выход</a>
+
+    <!-- Изображения -->
+    <img src="tri.jpg" alt="" class="bottom-left-image">
+    <img src="tri2.jpg" alt="" class="top-right-image">
+
+    <!-- Верхняя часть с логотипом -->
+    <header class="header">
+        <h1 class="logo">TUFF</h1>
+    </header>
+
+    <!-- Белая разделительная линия -->
+    <div class="divider"></div>
+
+    <!-- Основная часть -->
+    <main class="main-content">
+        <!-- Форма для нового сообщения -->
+        <div class="post-form">
+            <form id="postForm">
+                <textarea placeholder="Что у вас на уме?" required></textarea>
+                <button type="submit" class="btn-post">Опубликовать</button>
+            </form>
+        </div>
+
+        <!-- Стена с сообщениями -->
+        <div class="wall" id="wall">
+            <!-- Пример поста 1 -->
+            <div class="post">
+                <div class="post-header">
+                    <span class="post-author">Admin</span>
+                    <span class="post-date">2025-01-15 12:00</span>
+                </div>
+                <div class="post-content">
+                    Добро пожаловать на TUFF! Это форум для тех, кто хочет выделиться. 
+                    Оставляйте свои сообщения, делитесь мыслями и идеями.
+                </div>
+            </div>
+
+            <!-- Пример поста 2 -->
+            <div class="post">
+                <div class="post-header">
+                    <span class="post-author">User123</span>
+                    <span class="post-date">2025-01-15 14:30</span>
+                </div>
+                <div class="post-content">
+                    Отличный дизайн! Очень атмосферно и стильно. 
+                    Рад быть частью этого сообщества.
+                </div>
+            </div>
+
+            <!-- Пример поста 3 -->
+            <div class="post">
+                <div class="post-header">
+                    <span class="post-author">DarkAngel</span>
+                    <span class="post-date">2025-01-15 16:45</span>
+                </div>
+                <div class="post-content">
+                    Наконец-то место где можно быть собой. 
+                    Спасибо создателям за эту платформу!
+                </div>
+            </div>
+        </div>
+    </main>
+
+    <script>
+    // Проверяем, вошёл ли пользователь
+    const username = localStorage.getItem('username');
+    if (!username) {
+        alert('Сначала войдите в аккаунт');
+        window.location.href = 'login.html';
+    }
+
+    // Загружаем посты с сервера
+    async function loadPosts() {
+        const response = await fetch('http://localhost:5000/api/posts');
+        const posts = await response.json();
+        
+        const wall = document.getElementById('wall');
+        wall.innerHTML = '';
+        
+        for (let post of posts) {
+            const postDiv = document.createElement('div');
+            postDiv.className = 'post';
+            postDiv.innerHTML = `
+                <div class="post-header">
+                    <span class="post-author">${escapeHtml(post.username)}</span>
+                    <span class="post-date">${new Date().toLocaleDateString()}</span>
+                </div>
+                <div class="post-content">${escapeHtml(post.text)}</div>
+            `;
+            wall.appendChild(postDiv);
+        }
+    }
+
+    // Отправляем новый пост на сервер
+    async function addPost(text) {
+        const response = await fetch('http://localhost:5000/api/posts', {
+            method: 'POST',
+            headers: {'Content-Type': 'application/json'},
+            body: JSON.stringify({
+                username: username,
+                text: text
+            })
+        });
+        
+        if (response.ok) {
+            loadPosts(); // обновляем стену
+        } else {
+            alert('Ошибка при отправке поста');
+        }
+    }
+
+    // Защита от XSS (чтобы нельзя было сломать сайт)
+    function escapeHtml(text) {
+        const div = document.createElement('div');
+        div.textContent = text;
+        return div.innerHTML;
+    }
+
+    // Обработчик отправки формы
+    document.getElementById('postForm').addEventListener('submit', function(e) {
+        e.preventDefault();
+        
+        const textarea = this.querySelector('textarea');
+        const content = textarea.value.trim();
+        
+        if (content) {
+            addPost(content);
+            textarea.value = '';
+        }
+    });
+
+    // Загружаем посты при открытии страницы
+    loadPosts();
+</script>
+</body>
+</html>

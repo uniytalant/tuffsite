@@ -1,0 +1,141 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>TUFF - Главная</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            background-color: #000000;
+            color: #ffffff;
+            font-family: 'Arial', sans-serif;
+            height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            flex-direction: column;
+            overflow: hidden;
+            position: relative;
+        }
+
+        /* Изображение в левом нижнем углу */
+        .bottom-left-image {
+            position: absolute;
+            bottom: 20px;
+            left: 10px;
+            width: 300px;
+            height: auto;
+            opacity: 0.8;
+        }
+
+        /* Изображение в правом верхнем углу */
+        .top-right-image {
+            position: absolute;
+            top: 0px;
+            right: 10px;
+            width: 450px;
+            height: auto;
+            opacity: 0.8;
+        }
+
+        .logo {
+            font-family: 'Times New Roman', serif;
+            font-size: 12rem;
+            text-transform: uppercase;
+            letter-spacing: 10px;
+            margin-bottom: 50px;
+            opacity: 0;
+            animation: fadeIn 2s ease forwards;
+        }
+
+        .menu-container {
+            display: flex;
+            flex-direction: column;
+            gap: 20px;
+            opacity: 0;
+            animation: slideUp 1.5s ease 0.5s forwards;
+        }
+
+        .btn {
+            text-decoration: none;
+            color: #ffffff;
+            padding: 15px 60px;
+            font-size: 1.2rem;
+            text-transform: uppercase;
+            letter-spacing: 3px;
+            transition: all 0.3s ease;
+            width: 300px;
+            text-align: center;
+            cursor: pointer;
+        }
+
+        .btn:hover {
+            color: #cccccc;
+            transform: scale(1.05);
+        }
+
+        /* Текст снизу */
+        .footer-text {
+            position: absolute;
+            bottom: 40px;
+            left: 50%;
+            transform: translateX(-50%);
+            font-family: 'Times New Roman', serif;
+            font-size: 1.5rem;
+            color: rgba(255, 255, 255, 0.8);
+            text-align: center;
+            letter-spacing: 3px;
+            opacity: 0;
+            animation: fadeIn 2s ease 1s forwards;
+        }
+
+        @keyframes fadeIn {
+            to { opacity: 1; }
+        }
+
+        @keyframes slideUp {
+            from { 
+                transform: translateY(20px); 
+                opacity: 0; 
+            }
+            to { 
+                transform: translateY(0); 
+                opacity: 1; 
+            }
+        }
+
+        @media (max-width: 600px) {
+            .logo { font-size: 6rem; }
+            .btn { width: 250px; padding: 15px 30px; }
+            .bottom-left-image { width: 150px; bottom: 100px; left: 10px; }
+            .top-right-image { width: 200px; top: 0px; right: 10px; }
+            .footer-text { font-size: 1.1rem; padding: 0 20px; bottom: 30px; }
+        }
+    </style>
+</head>
+<body>
+    <!-- Изображение в левом нижнем углу -->
+    <img src="tri.jpg" alt="" class="bottom-left-image">
+
+    <!-- Изображение в правом верхнем углу -->
+    <img src="tri2.jpg" alt="" class="top-right-image">
+
+    <!-- Логотип -->
+    <h1 class="logo">TUFF</h1>
+
+    <!-- Кнопки -->
+    <div class="menu-container">
+        <a href="login.html" class="btn">Вход</a>
+        <a href="register.html" class="btn">Регистрация</a>
+    </div>
+
+    <!-- Текст снизу -->
+    <p class="footer-text">форум для тех кто хочет выделиться</p>
+</body>
+</html>
