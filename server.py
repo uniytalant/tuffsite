@@ -1,6 +1,7 @@
 from flask import Flask, request, jsonify
 from flask_cors import CORS
 import sqlite3
+import os
 
 app = Flask(__name__)
 CORS(app)
@@ -14,14 +15,12 @@ def create_tables():
     conn = get_db()
     cur = conn.cursor()
     
-    # Таблица пользователей
     cur.execute("""CREATE TABLE IF NOT EXISTS User_and_password (
         id INTEGER PRIMARY KEY AUTOINCREMENT,
         user_name TEXT,
         password TEXT
     )""")
     
-    # Таблица сообщений
     cur.execute("""CREATE TABLE IF NOT EXISTS User_and_massage (
         id INTEGER PRIMARY KEY AUTOINCREMENT,
         user_name TEXT,
@@ -32,9 +31,31 @@ def create_tables():
     conn.close()
     print("Таблицы проверены/созданы")
 
-# Вызываем создание таблиц при запуске
 create_tables()
 
+# --- HTML СТРАНИЦЫ ---
+@app.route('/')
+def index():
+    with open('index.html', 'r', encoding='utf-8') as f:
+        return f.read()
+
+@app.route('/login')
+def login_page():
+    with open('login.html', 'r', encoding='utf-8') as f:
+        return f.read()
+
+@app.route('/register')
+def register_page():
+    with open('register.html', 'r', encoding='utf-8') as f:
+        return f.read()
+
+@app.route('/wall')
+def wall_page():
+    with open('wall.html', 'r', encoding='utf-8') as f:
+        return f.read()
+# --------------------
+
+# --- API МАРШРУТЫ ---
 @app.route('/api/register', methods=['POST'])
 def register():
     data = request.json
