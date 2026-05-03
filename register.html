@@ -163,7 +163,7 @@
             <button type="submit" class="btn-submit">Зарегистрироваться</button>
         </form>
         
-        <a href="index.html" class="back-link">← Вернуться на главную</a>
+        <a href="/index" class="back-link">← Вернуться на главную</a>
     </div>
 <script>
     document.querySelector('form').addEventListener('submit', async (e) => {
@@ -182,7 +182,7 @@
         
         if (response.ok) {
             alert('Регистрация успешна!');
-            window.location.href = 'login.html';
+            window.location.href = '/login';
         } else {
             alert(data.error || 'Ошибка регистрации');
         }
